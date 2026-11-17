@@ -11,6 +11,6 @@ jobs:
         with: {gradle-version: 9.2.0}
       - run: gradle build --no-daemon -q
       - run: |
-          J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1)
-          echo "@@@SLEEVE"; javap -p -c -cp "$J" net.minecraft.client.render.entity.model.PlayerEntityModel | grep -E "setAngles\(net.minecraft.client.render.entity.state.PlayerEntityRenderState\)|copyTransform|addChild|Sleeve" | head -30
-          echo "@@@REFMAP"; unzip -l build/libs/serpent-wand-1.0.0.jar | grep -iE "refmap|mixins"; unzip -p build/libs/serpent-wand-1.0.0.jar serpent-wand-refmap.json 2>/dev/null | head -40
+          echo "@@@JAR"; unzip -l build/libs/serpent-wand-1.0.0.jar | grep -vE "assets/"
+          echo "@@@MIXINJSON"; unzip -p build/libs/serpent-wand-1.0.0.jar bonewand.mixins.json
+          echo "@@@MIXINCLASS"; unzip -p build/libs/serpent-wand-1.0.0.jar com/bonewand/mixin/PlayerEntityModelMixin.class > /tmp/M.class; strings /tmp/M.class | grep -iE "class_|method_|setAngles" | head
