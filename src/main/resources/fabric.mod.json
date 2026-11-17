@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "serpent",
   "version": "${version}",
-  "name": "Serpent Wand + Bone Wand",
-  "description": "Adds the Serpent Wand and the Bone Wand with harmless visual magic effects.",
+  "name": "Wands Pack",
+  "description": "Adds the Serpent, Bone, Magma and Celestial wands with harmless visual magic effects.",
   "authors": [
     "OpenAI"
   ],
@@ -12,7 +12,9 @@
   "entrypoints": {
     "main": [
       "com.serpent.SerpentWandMod",
-      "com.bonewand.BoneWandMod"
+      "com.bonewand.BoneWandMod",
+      "com.magmawand.MagmaWandMod",
+      "com.celestialwand.CelestialWandMod"
     ]
   },
   "depends": {
