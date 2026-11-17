@@ -53,9 +53,9 @@ public class SerpentWandMod implements ModInitializer {
                     return false;
                 }
 
-                if (!world.isClient && world instanceof ServerWorld serverWorld && user instanceof PlayerEntity player) {
+                if (!world.isClient() && world instanceof ServerWorld serverWorld && user instanceof PlayerEntity player) {
                     castVisualSpell(serverWorld, player);
-                    player.getItemCooldownManager().set(this, 16);
+                    player.getItemCooldownManager().set(stack, 16);
                 }
                 return true;
             }
@@ -63,7 +63,7 @@ public class SerpentWandMod implements ModInitializer {
     );
 
     private static void castVisualSpell(ServerWorld world, PlayerEntity user) {
-        Vec3d center = user.getPos();
+        Vec3d center = new Vec3d(user.getX(), user.getY(), user.getZ());
 
         // Harmless green-looking aura pulse around the player.
         for (int i = 0; i < 28; i++) {
