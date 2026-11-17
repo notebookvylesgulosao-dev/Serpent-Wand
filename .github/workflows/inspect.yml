@@ -12,7 +12,5 @@ jobs:
       - run: gradle build --no-daemon -q
       - run: |
           J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1)
-          echo "@@@HELD"; javap -p -cp "$J" net.minecraft.client.render.item.HeldItemRenderer | grep -E "\(" | grep -vE "static final"
-          echo "@@@ARMPOSE"; javap -p -cp "$J" 'net.minecraft.client.render.entity.model.BipedEntityModel$ArmPose' | head -30
-          echo "@@@ARMPOSING"; javap -p -cp "$J" net.minecraft.client.render.entity.model.ArmPosing
-          echo "@@@PAYLOAD"; javap -p -cp "$J" net.minecraft.network.packet.CustomPayload | head -20
+          echo "@@@SLEEVE"; javap -p -c -cp "$J" net.minecraft.client.render.entity.model.PlayerEntityModel | grep -E "setAngles\(net.minecraft.client.render.entity.state.PlayerEntityRenderState\)|copyTransform|addChild|Sleeve" | head -30
+          echo "@@@REFMAP"; unzip -l build/libs/serpent-wand-1.0.0.jar | grep -iE "refmap|mixins"; unzip -p build/libs/serpent-wand-1.0.0.jar serpent-wand-refmap.json 2>/dev/null | head -40
