@@ -11,6 +11,6 @@ jobs:
         with: {gradle-version: 9.2.0}
       - run: gradle build --no-daemon -q
       - run: |
-          find ~/.gradle /home/runner/work -name "*.jar" 2>/dev/null | grep -iE "minecraft" | head -20
-          J=$(find ~/.gradle -name "*.jar" | grep -iE "minecraft-(merged|client).*(named|yarn|mapped)|minecraft-merged" | head -1); echo "JAR=$J"
-          for c in net.minecraft.client.render.item.HeldItemRenderer net.minecraft.client.render.entity.model.BipedEntityModel net.minecraft.client.render.entity.model.PlayerEntityModel net.minecraft.client.render.entity.state.BipedEntityRenderState net.minecraft.client.render.entity.state.PlayerEntityRenderState net.minecraft.client.render.entity.PlayerEntityRenderer net.minecraft.client.render.entity.model.ArmPosing; do echo "=== $c"; javap -p -cp "$J" $c 2>&1 | head -80; done
+          J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1); echo "JAR=$J"
+          unzip -l "$J" | awk '{print $4}' | grep -E "(HeldItemRenderer|BipedEntityModel|PlayerEntityModel|BipedEntityRenderState|PlayerEntityRenderState|PlayerEntityRenderer|ArmPosing|ArmedEntityRenderState|LivingEntityRenderState|ItemUseAnimation|UseAction)\.class$" > /tmp/classes.txt; cat /tmp/classes.txt
+          for f in $(cat /tmp/classes.txt); do c=$(echo ${f%.class} | tr / .); echo "=== $c"; javap -p -cp "$J" $c 2>&1 | head -90; done
