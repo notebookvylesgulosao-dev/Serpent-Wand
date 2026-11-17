@@ -11,6 +11,8 @@ jobs:
         with: {gradle-version: 9.2.0}
       - run: gradle build --no-daemon -q
       - run: |
-          J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1); echo "JAR=$J"
-          unzip -l "$J" | awk '{print $4}' | grep -E "(HeldItemRenderer|BipedEntityModel|PlayerEntityModel|BipedEntityRenderState|PlayerEntityRenderState|PlayerEntityRenderer|ArmPosing|ArmedEntityRenderState|LivingEntityRenderState|ItemUseAnimation|UseAction)\.class$" > /tmp/classes.txt; cat /tmp/classes.txt
-          for f in $(cat /tmp/classes.txt); do c=$(echo ${f%.class} | tr / .); echo "=== $c"; javap -p -cp "$J" $c 2>&1 | head -90; done
+          J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1)
+          echo "@@@HELD"; javap -p -cp "$J" net.minecraft.client.render.item.HeldItemRenderer | grep -E "\(" | grep -vE "static final"
+          echo "@@@ARMPOSE"; javap -p -cp "$J" 'net.minecraft.client.render.entity.model.BipedEntityModel$ArmPose' | head -30
+          echo "@@@ARMPOSING"; javap -p -cp "$J" net.minecraft.client.render.entity.model.ArmPosing
+          echo "@@@PAYLOAD"; javap -p -cp "$J" net.minecraft.network.packet.CustomPayload | head -20
