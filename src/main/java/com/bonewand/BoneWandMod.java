@@ -12,6 +12,11 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Arm;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -27,7 +32,7 @@ public class BoneWandMod implements ModInitializer {
         new Item(new Item.Settings()
             .registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "bone_wand")))
             .maxCount(1)) {
-            @Override public UseAction getUseAction(ItemStack stack) { return UseAction.BOW; }
+            @Override public UseAction getUseAction(ItemStack stack) { return UseAction.NONE; }
             @Override public int getMaxUseTime(ItemStack stack, LivingEntity user) { return 72; }
             @Override public ActionResult use(World world, PlayerEntity user, Hand hand) {
                 user.setCurrentHand(hand);
@@ -38,6 +43,7 @@ public class BoneWandMod implements ModInitializer {
                 if (heldTicks < CHARGE_TICKS) return false;
                 if (!world.isClient() && world instanceof ServerWorld serverWorld && user instanceof PlayerEntity player) {
                     castVisualSpell(serverWorld, player);
+                    if (player instanceof ServerPlayerEntity sp) sendCast(sp, user.getActiveHand());
                     player.getItemCooldownManager().set(stack, 16);
                 }
                 return true;
@@ -60,5 +66,16 @@ public class BoneWandMod implements ModInitializer {
         }
         world.spawnParticles(ParticleTypes.SOUL, start.x, start.y, start.z, 8, 0.08, 0.08, 0.08, 0.01);
     }
-    @Override public void onInitialize() { }
+    private static void sendCast(ServerPlayerEntity player, Hand hand) {
+        Arm arm = hand == Hand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
+        BoneCastPayload payload = new BoneCastPayload(player.getId(), arm == Arm.RIGHT);
+        ServerPlayNetworking.send(player, payload);
+        for (ServerPlayerEntity other : PlayerLookup.tracking(player)) {
+            ServerPlayNetworking.send(other, payload);
+        }
+    }
+
+    @Override public void onInitialize() {
+        PayloadTypeRegistry.playS2C().register(BoneCastPayload.ID, BoneCastPayload.CODEC);
+    }
 }
