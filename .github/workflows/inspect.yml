@@ -1,0 +1,19 @@
+name: Inspect API
+on: workflow_dispatch
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: 21}
+      - uses: gradle/actions/setup-gradle@v4
+        with: {gradle-version: 9.2.0}
+      - run: gradle build --no-daemon -q
+      - run: |
+          J=$(find ~/.gradle -path "*minecraftMaven/net/minecraft/minecraft-merged/*" -name "*.jar" | head -1)
+          for c in net.minecraft.entity.projectile.ProjectileEntity net.minecraft.entity.projectile.ProjectileUtil 'net.minecraft.entity.EntityType$Builder' net.minecraft.client.render.entity.EntityRenderer net.minecraft.particle.DustParticleEffect net.minecraft.entity.damage.DamageSources; do echo "@@@ $c"; javap -p -cp "$J" "$c" | grep -vE "static final|private static|synthetic|^\s+private" | cut -c1-260; done
+          echo "@@@ ENTITY"; javap -p -cp "$J" net.minecraft.entity.Entity | grep -E " (damage|serverDamage|getEntityWorld|getWorld|getPos|setPosition|setVelocity|getVelocity|discard|isOnFire|setOnFireFor|getEyePos|getRotationVec|setNoGravity|updateRotation)\("
+          echo "@@@ SERVERWORLD"; javap -p -cp "$J" net.minecraft.server.world.ServerWorld | grep -E "spawnParticles|spawnEntity"
+          echo "@@@ LIVING"; javap -p -cp "$J" net.minecraft.entity.LivingEntity | grep -E " damage\("
+          echo "@@@ ITEMSTACK"; javap -p -cp "$J" net.minecraft.world.World | grep -E "isClient|getTime|raycast"
