@@ -2,13 +2,18 @@
   "schemaVersion": 1,
   "id": "serpent",
   "version": "${version}",
-  "name": "Serpent Wand",
-  "description": "Adds the Serpent Wand with harmless green visual magic effects.",
-  "authors": ["OpenAI"],
+  "name": "Serpent Wand + Bone Wand",
+  "description": "Adds the Serpent Wand and the Bone Wand with harmless visual magic effects.",
+  "authors": [
+    "OpenAI"
+  ],
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.serpent.SerpentWandMod"]
+    "main": [
+      "com.serpent.SerpentWandMod",
+      "com.bonewand.BoneWandMod"
+    ]
   },
   "depends": {
     "fabricloader": ">=0.18.1",
